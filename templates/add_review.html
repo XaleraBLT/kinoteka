@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить рецензию</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(270deg, #3b82f6, #1d4ed8);
+        }
+        .gradient-text {
+            background: linear-gradient(270deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+    <nav class="gradient-bg p-4 text-white">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold">Кинотека</a>
+        <div class="flex items-center space-x-4">
+            <form action="/search" method="get" class="flex items-center">
+                <input
+                    type="text"
+                    name="query"
+                    placeholder="Поиск..."
+                    class="px-4 py-2 rounded-l-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+                >
+                <button
+                    type="submit"
+                    class="px-4 py-2 rounded-r-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                >
+                    Найти
+                </button>
+            </form>
+            {% if current_user.is_authenticated %}
+                <span class="text-white">{{ current_user.username }}</span>
+                <a href="/logout" class="hover:text-gray-200">Выйти</a>
+            {% else %}
+                <a href="/login" class="hover:text-gray-200">Вход</a>
+                <a href="/register" class="hover:text-gray-200">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-4 gradient-text">Добавить рецензию</h1>
+        <form method="POST" class="bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-4">
+                <label for="title" class="block text-gray-700">Заголовок</label>
+                <input type="text" name="title" id="title" class="w-full px-4 py-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label for="content" class="block text-gray-700">Рецензия</label>
+                <textarea name="content" id="content" class="w-full px-4 py-2 border rounded-lg"></textarea>
+            </div>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Отправить</button>
+        </form>
+    </div>
+</body>
+</html>

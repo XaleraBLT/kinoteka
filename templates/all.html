@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Все фильмы</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-text {
+            background: linear-gradient(270deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-bg {
+            background: linear-gradient(270deg, #3b82f6, #1d4ed8);
+        }
+    </style>
+</head>
+<body class="bg-gray-200 text-gray-900">
+    <nav class="gradient-bg p-4 text-white">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold">Кинотека</a>
+        <div class="flex items-center space-x-4">
+            <form action="/search" method="get" class="flex items-center">
+                <input
+                    type="text"
+                    name="query"
+                    placeholder="Поиск..."
+                    class="px-4 py-2 rounded-l-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+                >
+                <button
+                    type="submit"
+                    class="px-4 py-2 rounded-r-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                >
+                    Найти
+                </button>
+            </form>
+            {% if current_user.is_authenticated %}
+                <span class="text-white">{{ current_user.username }}</span>
+                <a href="/logout" class="hover:text-gray-200">Выйти</a>
+            {% else %}
+                <a href="/login" class="hover:text-gray-200">Вход</a>
+                <a href="/register" class="hover:text-gray-200">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-4 gradient-text">Все фильмы</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for title, data in films.items() %}
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                {% if data.image %}
+                <img src="{{ data.image }}" alt="{{ title }}" class="w-full h-48 object-cover rounded-t-lg">
+            {% else %}
+                <div class="w-full h-48 bg-gray-200 rounded-t-lg flex items-center justify-center">
+                    <span class="text-gray-500 text-lg">Нет изображения</span>
+                </div>
+            {% endif %}
+                <div class="p-4">
+                    <h2 class="text-xl font-semibold gradient-text">
+                        <a href="/film/{{ data.original_title | urlencode }}" class="hover:text-blue-800">
+                            {{ title }}
+                        </a>
+                    </h2>
+                     <p class="text-gray-400 mt-2">
+    {{ data.description_mini | truncate(100, True, '...') }}
+</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

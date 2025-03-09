@@ -1,0 +1,8 @@
+torch==2.2.2
+einops
+faiss-cpu
+sentence_transformers
+flask
+flask-login
+flask-sqlalchemy
+typing-extensions==4.5.0

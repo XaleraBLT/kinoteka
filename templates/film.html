@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{{ film.original_title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+
+        .gradient-text {
+            background: linear-gradient(90deg, #2563eb, #1e40af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-bg {
+            background: linear-gradient(90deg, #2563eb, #1e40af);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+<nav class="gradient-bg p-4 text-white">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold">Кинотека</a>
+        <div class="flex items-center space-x-4">
+            <form action="/search" method="get" class="flex items-center">
+                <input
+                        type="text"
+                        name="query"
+                        placeholder="Поиск..."
+                        class="px-4 py-2 rounded-l-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+                >
+                <button
+                        type="submit"
+                        class="px-4 py-2 rounded-r-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                >
+                    Найти
+                </button>
+            </form>
+            {% if current_user.is_authenticated %}
+            <span class="text-white">{{ current_user.username }}</span>
+            <a href="/logout" class="hover:text-gray-200">Выйти</a>
+            {% else %}
+            <a href="/login" class="hover:text-gray-200">Вход</a>
+            <a href="/register" class="hover:text-gray-200">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-extrabold mb-6 gradient-text text-center">{{ film.title }}</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-6">
+            {% if film.image %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <img src="{{ film.image }}" alt="{{ film.original_title }}" class="w-full object-cover">
+            </div>
+            {% endif %}
+            {% if film.trailer %}
+            <div>
+                <h2 class="text-2xl font-bold mb-3 gradient-text">Трейлер</h2>
+                <div class="overflow-hidden rounded-lg shadow-lg">
+                    <iframe class="w-full h-64 md:h-80" src="{{ film.trailer | replace('watch?v=', 'embed/') }}"
+                            frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <!-- Дата выхода -->
+                {% if film.release_date %}
+                {% set months = {
+                "01": "Январь", "02": "Февраль", "03": "Март", "04": "Апрель",
+                "05": "Май", "06": "Июнь", "07": "Июль", "08": "Август",
+                "09": "Сентябрь", "10": "Октябрь", "11": "Ноябрь", "12": "Декабрь"
+                } %}
+                {% set month = film.release_date[5:7] %}
+                {% set year = film.release_date[:4] %}
+                <p><span class="font-semibold">Дата выхода:</span> {{ months.get(month, "Неизвестно") }} {{ year }}</p>
+                {% endif %}
+                {% if film.genres %}
+                <p class="mt-2"><span class="font-semibold">Жанры:</span> {{ film.genres | replace("[", "") |
+                    replace("]", "") | replace("'", "") }}</p>
+                {% endif %}
+                {% if film.vote_average %}
+                <p class="mt-2"><span class="font-semibold">Рейтинг:</span> ⭐ {{ "%.1f"|format(film.vote_average|float)
+                    }}/10</p>
+                {% endif %}
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-3 gradient-text">Описание</h2>
+                <p class="mb-4" id="description-mini">{{ film.description_mini }}</p>
+                <p class="mb-4 hidden" id="description-full">{{ film.description }}</p>
+                <button onclick="toggleDescription()"
+                        class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    Посмотреть полное описание (спойлеры)
+                </button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 gradient-text">Оцените фильм</h2>
+                {% if current_user.is_authenticated %}
+                {% if user_rating %}
+                <p class="mb-3">Ваша оценка: <span class="font-semibold">{{ user_rating }}</span></p>
+                {% else %}
+                <form action="{{ url_for('rate_film', film_title=film.original_title) }}" method="post"
+                      class="flex items-center space-x-4">
+                    <select name="rating"
+                            class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        {% for i in range(1, 11) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        Оценить
+                    </button>
+                </form>
+                {% endif %}
+                {% else %}
+                <p>Чтобы оценить фильм, <a href="/login" class="text-blue-600 hover:underline">войдите</a> или <a
+                        href="/register" class="text-blue-600 hover:underline">зарегистрируйтесь</a>.</p>
+                {% endif %}
+                <p class="mt-4"><span class="font-semibold">Средний рейтинг:</span> ⭐ {{ average_rating }}</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 gradient-text">Рецензии</h2>
+                {% for review in reviews %}
+                <div class="border-b border-gray-200 pb-4 mb-4 last:border-0">
+                    <h3 class="text-xl font-semibold text-blue-600">{{ review.title }}</h3>
+                    <p class="mt-2">{{ review.content }}</p>
+                </div>
+                {% endfor %}
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('add_review', film_title=film.original_title) }}"
+                   class="inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    Добавить рецензию
+                </a>
+                {% else %}
+                <p>Чтобы оставить рецензию, <a href="/login" class="text-blue-600 hover:underline">войдите</a> или <a
+                        href="/register" class="text-blue-600 hover:underline">зарегистрируйтесь</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function toggleDescription() {
+        const descriptionMini = document.getElementById('description-mini');
+        const descriptionFull = document.getElementById('description-full');
+        const button = document.querySelector('button[onclick="toggleDescription()"]');
+
+        if (descriptionFull.classList.contains('hidden')) {
+            descriptionMini.classList.add('hidden');
+            descriptionFull.classList.remove('hidden');
+            button.textContent = 'Скрыть полное описание';
+        } else {
+            descriptionMini.classList.remove('hidden');
+            descriptionFull.classList.add('hidden');
+            button.textContent = 'Посмотреть полное описание (спойлеры)';
+        }
+    }
+</script>
+</body>
+</html>
