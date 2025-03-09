@@ -45,6 +45,8 @@ python app.py
 - [**templates**](/templates) - html-шаблоны страниц
 - [**README.md**](/README.md) - инструкция
 - [**requirements.txt**](/requirements.txt) - файл с зависимостями (библиотеками) для установки
+- [**video.mp4**](/video.mp4) - видео-демонстрация работы
+- [**presentation.pdf**](/presentation.pdf) - презентация
 - **nomic-ai** - веса моделей (устанавливаются в процессе)
 
 
