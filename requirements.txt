@@ -5,4 +5,4 @@ sentence_transformers
 flask
 flask-login
 flask-sqlalchemy
-typing-extensions==4.5.0
+typing-extensions==4.8.0
