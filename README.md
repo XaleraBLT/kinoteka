@@ -30,4 +30,8 @@ pip install -r requirements.txt
 ```commandline
 python app.py
 ```
+# 2. Описание содержащихся файлов
+[**./app.py**](/app.py) - файл с бэкенд-оформлением сайта
+[**./search.py**](/search.py) - файл с алгоритмом поиска 
+[**./recommend_film.py**](/recommend_film.py) - файл с алгоритмом предоставления рекомендаций к просмтору
 
